@@ -90,6 +90,13 @@ public class RoomMenu extends MenuBase {
 					EventBus.PublishEvent(OpenMenuEvent.class, openMenuEv);
 				}
 				break;
+			case Key.M:
+				//because the input-event flow, you can'not open a Map for example during a combat
+				//	or an important dialog: RoomMenu won't see your input
+				var mapMenu = new MapMenu();
+				var openMenuEv = new OpenMenuEvent(this, mapMenu);
+				EventBus.PublishEvent(OpenMenuEvent.class, openMenuEv);
+				break;
 			case Key.ESCAPE:
 				dispose();
 				break;

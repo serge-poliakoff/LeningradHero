@@ -10,6 +10,7 @@ import Game.Weapons.WoodenSword;
 import domain.DI.ServiceResolver;
 import domain.bag.Bag;
 import domain.eventing.EventBus;
+import domain.map.GameMap;
 import domain.map.Room;
 import domain.menu.IMenu;
 import domain.menu.MenuBase;
@@ -33,8 +34,8 @@ public class Main {
 		IO.println();
 	}
 	
-	/*public static void Main(String[] args) {
-		var arr = new int[][] {
+	public static void Main(String[] args) {
+		/*var arr = new int[][] {
 			new int[] {0, 1, 0},
 			new int[] {1, 1, 1},
 			new int[] {1, 0, 0}
@@ -42,8 +43,15 @@ public class Main {
 		
 		var deformer = new ArrayDeformer();
 		for(int i = 0; i < 4; i ++)
-			printArr(deformer.rotate(arr, i));
-	}*/
+			printArr(deformer.rotate(arr, i));*/
+		var map = new GameMap();
+		map.printMap();
+		IO.println();
+		IO.println("Is it possible to travel to 1,1 ? " + map.travelPossible(1, 1));
+		map.printMap();
+		IO.println();
+		IO.println("Is it possible to travel to 2,2 ? " + map.travelPossible(2, 2));
+	}
 	
 	public static void main(String[] args) {
 		//logging
@@ -53,6 +61,7 @@ public class Main {
 		
 		//adding menus to the render queue
 		EventBus.registerListener(OpenMenuEvent.class, ev -> {
+			IO.println("Opening menu " + ((OpenMenuEvent)ev).menu());
 			menus.add(
 					((OpenMenuEvent)ev).menu()
 					);
@@ -68,6 +77,8 @@ public class Main {
 	      };
 	    var bagManager = new Bag(bag);
 	    ServiceResolver.RegisterService(() -> bagManager);
+	    var map = new GameMap();
+	    ServiceResolver.RegisterService(() -> map);
 		
 	    var room = new Room(1, null, null);
 		menus.add(new RoomMenu(room));

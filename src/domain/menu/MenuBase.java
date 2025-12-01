@@ -38,6 +38,7 @@ public abstract class MenuBase implements IMenu{
 	}
 	
 	protected void dispose() {
+		IO.println(this + " is disposing...");
 		onDispose();
 		
 		listeners.forEach((evType, listener) -> {
