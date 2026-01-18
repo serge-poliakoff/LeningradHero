@@ -97,12 +97,7 @@ public class RoomMenu extends MenuBase {
 		var key = ev.key();
 		switch(key) {
 			case Key.SPACE:
-				if (baseRecord.getContentFabric() != null) {
-					var content = baseRecord.getContentFabric().get();
-					EventBus.PublishEvent(OpenMenuEvent.class, new OpenMenuEvent(content, false));
-				}else {
-					ServiceResolver.getService(BagGI.class).setActive(true);
-				}
+				ServiceResolver.getService(BagGI.class).setActive(true);
 				return true;
 			case Key.M:
 				//because the input-event flow, you can'not open a Map for example during a combat
@@ -121,7 +116,7 @@ public class RoomMenu extends MenuBase {
 	}
 	
 	@Override
-	protected void onDispose() {
+	protected void onMenuDispose(){
 		baseRecord.saveResources(roomStock.getTreasures());
 	}
 	

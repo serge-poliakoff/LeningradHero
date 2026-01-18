@@ -147,15 +147,18 @@ public class CombatMenu extends MenuBase {
 		
 		var key = ev.key();
 		switch(key) {
+			case Key.SPACE:
+				ServiceResolver.getService(BagGI.class).setActive(true);
+				return true;
 			case Key.P:
 				makeCycle();
 				return true;
 			default: return false;
 		}
 	}
-	
+
 	@Override
-	public void onDispose() {
+	protected void onMenuDispose() {
 		EventBus.PublishEvent(LiberateRoomEvent.class, new LiberateRoomEvent());
 		for (var rewardItem : reward)
 			EventBus.PublishEvent(DropItemEvent.class, new DropItemEvent(rewardItem));

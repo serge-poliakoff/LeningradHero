@@ -42,7 +42,7 @@ public class StorageEntry extends Clickable {
 	}
 	
 	@Override
-	protected void onDispose() {
+	protected void onObjectDispose() {
 		trs.dispose();
 	}
 

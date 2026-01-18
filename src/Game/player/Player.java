@@ -22,7 +22,7 @@ public class Player extends DrawableObject {
 	}
 
 	@Override
-	protected void onDispose() {
+	protected void onObjectDispose() {
 			
 	}
 

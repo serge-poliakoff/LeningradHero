@@ -15,7 +15,7 @@ import domain.Graphics.Vector2;
 import domain.eventing.EventBus;
 import domain.eventing.Subscribeable;
 
-public abstract class DrawableObject implements Subscribeable {
+public abstract class DrawableObject extends Subscribeable {
 	private DrawableObject parent;
 	private Vector2 pos;
 	private double rotation;
@@ -25,9 +25,6 @@ public abstract class DrawableObject implements Subscribeable {
 	private GraphicsAdapter adapter;
 	
 	private boolean active;
-	
-	private Map<Class<? extends Object>,Consumer<? extends Object>> listeners 
-	= new HashMap<Class<? extends Object>, Consumer<? extends Object>>();
 	
 	protected DrawableObject(Vector2 pos, RendererBase renderer) {
 		Objects.requireNonNull(pos);
@@ -139,25 +136,13 @@ public abstract class DrawableObject implements Subscribeable {
 		
 	}
 	
-	public <E extends Object> void addListener(Class<E> ev,Consumer<E> li) {
-		listeners.put(ev, li);
-		EventBus.registerListener(ev, li);
-	}
-	
 	///liberates all resources, associated with object
 	///before it is actually destroyed by GC
-	public final void dispose() {
-		IO.println(this + " is disposing...");
-		onDispose();
-		
+	@Override
+	protected final void onDispose() {
+		onObjectDispose();
 		renderer.dispose();
-		//no need to setActive - all listeners are automatically erased,
-		//so object will no more receive updates or be rendered
-		listeners.forEach((evType, listener) -> {
-			EventBus.supressListener(evType, listener);
-		});
 	}
-	
-	///function which is called before object's dispose
-	protected abstract void onDispose();
+
+	protected abstract void onObjectDispose();
 }

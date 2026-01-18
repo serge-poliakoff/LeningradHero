@@ -104,7 +104,7 @@ public class Treasury extends DroppableArea {
 	}
 
 	@Override
-	protected void onDispose() {
+	protected void onObjectDispose() {
 		onDisabled();
 		trs.clear();
 	}

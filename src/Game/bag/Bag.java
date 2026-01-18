@@ -1,21 +1,13 @@
 package Game.bag;
 
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
 import Game.bag.items.Baggable;
 import Game.bag.items.unlock.BagUnlock;
-import Game.rendering.BaseLayoutInformation;
-import domain.DrawableObject;
-import domain.DI.ServiceResolver;
 import domain.Graphics.Vector2;
 import domain.eventing.EventBus;
 

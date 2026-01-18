@@ -61,7 +61,7 @@ public class Rat extends Enemy{
 	}
 
 	@Override
-	protected void onDispose() {
+	protected void onObjectDispose() {
 		
 	}
 

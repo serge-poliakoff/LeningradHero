@@ -24,6 +24,6 @@ public abstract class Enemy extends Clickable {
 	public abstract boolean isDead();
 	
 	@Override
-	protected void onDispose() {}
+	protected void onObjectDispose() {}
 
 }

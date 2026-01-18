@@ -107,4 +107,9 @@ public class MapMenu extends MenuBase {
 		return false;
 	}
 
+	@Override
+	protected void onMenuDispose() {
+		
+	}
+
 }

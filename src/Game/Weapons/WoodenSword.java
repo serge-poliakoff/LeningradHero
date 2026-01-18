@@ -57,14 +57,12 @@ public class WoodenSword extends Baggable {
 	}
 
 	@Override
-	protected void onDispose() {
-		// TODO Auto-generated method stub
-		
+	protected void onObjectDispose() {
+
 	}
 
 	@Override
 	protected void onClick() {
-		// TODO Auto-generated method stub
 		
 	}
 	

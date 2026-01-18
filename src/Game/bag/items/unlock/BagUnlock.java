@@ -42,7 +42,7 @@ public class BagUnlock extends Baggable {
 	}
 
 	@Override
-	protected void onDispose() {
+	protected void onObjectDispose() {
 		
 	}
 

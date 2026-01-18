@@ -2,32 +2,20 @@ package domain.menu;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
-
 import com.github.forax.zen.KeyboardEvent;
-import com.github.forax.zen.PointerEvent;
-import com.github.forax.zen.KeyboardEvent.Action;
-import com.github.forax.zen.KeyboardEvent.Key;
 
 import domain.DrawableObject;
-import domain.eventing.EventBus;
+import domain.eventing.Subscribeable;
 import domain.playerInput.KeyboardHandler;
 
-public abstract class MenuBase implements KeyboardHandler{
-	//add onEnabled function -> invoked on the first render
-	//	public renderSelf -> public final renderSelf { if (firstFrame) onEnabled(); renderSelfProtected();}
-	private Map<Class<? extends Object>,Consumer<? extends Object>> listeners 
-	= new HashMap<Class<? extends Object>, Consumer<? extends Object>>();
-	private boolean disposed = false;
-	
+public abstract class MenuBase extends Subscribeable implements KeyboardHandler{
 	///DrawableObject objects, associated with this menu
 	///note that it is up to user of engine to keep track that each object is not disposed yet
 	private List<DrawableObject> objects = new ArrayList<DrawableObject>();
 	
+	private boolean disposed = false;
 	private boolean awake = false;
 	
 	///adds object to keep track of it for hide/reveal operations and to delete it at dispose
@@ -66,26 +54,16 @@ public abstract class MenuBase implements KeyboardHandler{
 	
 	public abstract boolean handleKey(KeyboardEvent ev);
 	
-	protected void onDispose() {}
-	
 	public Boolean getDisposed() {
 		return disposed;
 	}
 	
-	protected <E> void addListener(Class<E> ev,Consumer<E> li) {
-		listeners.put(ev, li);
-		EventBus.registerListener(ev, li);
-	}
-	
-	public void dispose() {
-		IO.println(this + " is disposing...");
-		onDispose();
-		
-		listeners.forEach((evType, listener) -> {
-			EventBus.supressListener(evType, listener);
-		});
+	@Override
+	protected final void onDispose() {
+		onMenuDispose();
 		objects.forEach(obj -> obj.dispose());
-		
 		disposed = true;
 	}
+
+	protected abstract void onMenuDispose();
 }

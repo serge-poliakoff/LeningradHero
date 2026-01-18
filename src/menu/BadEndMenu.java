@@ -48,4 +48,9 @@ public class BadEndMenu extends MenuBase {
 		}
 	}
 
+	@Override
+	protected void onMenuDispose() {
+		
+	}
+
 }

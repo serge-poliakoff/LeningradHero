@@ -50,6 +50,6 @@ public abstract class Clickable extends DrawableObject {
 	protected void onUnClick() {};
 	
 	@Override
-	protected abstract void onDispose();
+	protected abstract void onObjectDispose();
 
 }

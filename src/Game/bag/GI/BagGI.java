@@ -187,8 +187,9 @@ public class BagGI extends DroppableArea implements KeyboardHandler{
 				return false;
 		}
 	}
-	
-	protected void onDispose() {
+
+	@Override
+	protected void onObjectDispose() {
 		
 	}
 }
