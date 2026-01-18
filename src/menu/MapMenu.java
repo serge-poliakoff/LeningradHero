@@ -44,7 +44,7 @@ public class MapMenu extends MenuBase {
 	}
 	
 	@Override
-	public void renderSelf(Graphics2D gr) {
+	public void onRender(Graphics2D gr) {
 		var menu = gr.create(offX, offY, winW, winH);
 		menu.clearRect(0, 0, winW, winH);
 		
@@ -55,7 +55,7 @@ public class MapMenu extends MenuBase {
 			
 				if (mapGrid[i][j] == null) {
 					menu.setColor(colorBg);
-				}else if(mapGrid[i][j].getFreePassage() == 0) {
+				}else if(!mapGrid[i][j].getFreePassage()) {
 					menu.setColor(colorClosed);
 				}else {
 					menu.setColor(colorLibre);
@@ -76,9 +76,9 @@ public class MapMenu extends MenuBase {
 	}
 
 	@Override
-	public void handleKey(KeyboardEvent ev) {
+	public boolean handleKey(KeyboardEvent ev) {
 		if (ev.action() != Action.KEY_PRESSED) {
-			return;
+			return false;
 		}
 		var key = ev.key();
 		switch(key) {
@@ -104,12 +104,7 @@ public class MapMenu extends MenuBase {
 				}
 				break;
 		}
-	}
-
-	@Override
-	public void handleMouse(PointerEvent ev) {
-		
-		return;
+		return false;
 	}
 
 }

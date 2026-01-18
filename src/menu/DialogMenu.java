@@ -12,21 +12,17 @@ public class DialogMenu extends MenuBase {
 	
 	
 	@Override
-	public void renderSelf(Graphics2D gr) {
+	public void onRender(Graphics2D gr) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void handleKey(KeyboardEvent ev) {
+	public boolean handleKey(KeyboardEvent ev) {
+		return false;
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	public void handleMouse(PointerEvent ev) {
-		// TODO Auto-generated method stub
-
-	}
 
 }

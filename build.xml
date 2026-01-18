@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+
+<project default="jar" name="BackpackHero" basedir=".">
+    
+    <property name="dir.buildfile" value="."/>
+	<property name="dir.src" value="src"/>
+    <property name="dir.classes" value="class"/>
+    <property name="dir.jarfile" value="${dir.buildfile}"/>
+	<property name="dir.lib" value="lib"/>
+	
+<target name="print-version"> 
+    <echo>Java/JVM version: ${ant.java.version}</echo> 
+    <echo>Java/JVM detail version: ${java.version}</echo> 
+    </target>
+
+	<target name="init" depends="print-version">
+		<mkdir dir="${dir.classes}"/>
+	</target>
+
+    
+
+    <target name="compile" depends="init">
+        <javac srcdir="${dir.src}" destdir="${dir.classes}"
+                includeantruntime="false">
+            <classpath>
+                <fileset dir="${dir.lib}" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+	
+  <target name="jar" depends="compile">
+        <jar destfile="${dir.jarfile}/BackPackHero.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="Main"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${dir.classes}"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.jarfile}/lib/zen-6.0.jar"/>
+        </jar>
+    </target>
+</project>

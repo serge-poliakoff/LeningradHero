@@ -1,7 +1,18 @@
 package domain.map;
 
+import java.util.function.Supplier;
+
+import Game.Weapons.WoodenSword;
+import Game.bag.items.Baggable;
+import Game.bag.items.unlock.BagUnlock;
+import Game.enemies.Enemy;
+import Game.enemies.Rat.Rat;
+import domain.Graphics.Vector2;
+import domain.combat.IEnemy;
 import domain.eventing.EventBus;
+import domain.menu.MenuBase;
 import domain.menu.OpenMenuEvent;
+import menu.CombatMenu;
 import menu.RoomMenu;
 
 public class GameMap {
@@ -10,11 +21,18 @@ public class GameMap {
 	private int mapX = 11, mapY = 5;
 	
 	private Room emptyRoom() {
-		return new Room(1, null, null);
+		return new Room(true, null, new Baggable[] {});
 	}
 	
-	private Room busyRoom() {
-		return new Room(0, null, null);
+	private Room combatRoom() {
+		Supplier<MenuBase> combat = () -> new CombatMenu(
+				new Enemy[] { new Rat(new Vector2(0, 0)), new Rat(new Vector2(0, 0))},
+				new Baggable[] {});
+		return new Room(false, combat, new Baggable[] {new WoodenSword()});
+	}
+	
+	private Room treasureRoom() {
+		return new Room(true, null, new Baggable[] { new WoodenSword() });
 	}
 	
 	public GameMap() {
@@ -22,14 +40,31 @@ public class GameMap {
 		for(int i = 0; i < mapX; i ++)
 			for(int j = 0; j < mapY; j ++)
 				map[i][j] = null;
-		map[0][0] = emptyRoom();
-		map[1][1] = emptyRoom();
-		map[0][1] = emptyRoom();
-		map[1][2] = busyRoom();
-		map[2][1] = emptyRoom();
-		map[2][2] = busyRoom();
+		
 		
 		plX = plY = 0;
+	}
+	
+	public void create() {
+		map[0][0] = new Room(true, null, new Baggable[] {new WoodenSword(),
+				new BagUnlock(
+						new int[][] {
+							new int[] { 1 }
+						}, new Vector2(0,0))});
+		map[0][1] = combatRoom();
+		map[1][1] = combatRoom();
+		map[0][1] = treasureRoom();
+		map[1][2] = combatRoom();
+		map[2][1] = emptyRoom();
+		map[2][2] = emptyRoom();
+		map[2][3] = treasureRoom();
+		map[3][2] = combatRoom();
+		map[3][3] = emptyRoom();
+		map[4][2] = combatRoom();
+		map[5][2] = emptyRoom();
+		map[5][1] = combatRoom();
+		map[6][0] = treasureRoom();
+		map[6][1] = emptyRoom();
 	}
 	
 	public int[] getShape() {
@@ -48,9 +83,12 @@ public class GameMap {
 	public int travel(int x, int y) {
 		if (!travelPossible(x, y)) return -1;
 		
+		//make room investigated if it wasn't
+		//map[x][y].setFree();
+		
 		var room = new RoomMenu(map[x][y]);
 		EventBus.PublishEvent(OpenMenuEvent.class, 
-				new OpenMenuEvent(this, room));
+				new OpenMenuEvent(room, true));
 		plX = x;
 		plY = y;
 		return 0;
@@ -74,7 +112,7 @@ public class GameMap {
 		if (destX >= map.length || destX < 0) return false;
 		if (destY >= map.length || destY < 0) return false;
 		
-		if (map[destX][destY] == null || map[destX][destY].getFreePassage() != 1) {
+		if (map[destX][destY] == null || !map[destX][destY].getFreePassage()) {
 			return false;
 		}
 		if (destX == plX && destY == plY) return true;

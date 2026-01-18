@@ -1,45 +1,71 @@
 package Game.Weapons;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 
-import domain.bag.*;
+import Game.bag.items.Baggable;
+import Game.graphicComponents.NotificationEvent;
+import Game.player.Player;
+import Game.rendering.BaseLayoutInformation;
+import domain.DI.ServiceResolver;
+import domain.Graphics.Vector2;
+import domain.combat.Attack;
+import domain.combat.events.AttackEvent;
+import domain.eventing.EventBus;
 
 public class WoodenSword extends Baggable {
+	private Attack attack;
 	
 	public WoodenSword() {
+		attack = new Attack(3, 1, 0);	//3 damage, 1 energy used
+		
 		var shape = new int[][] {
 			new int[] { 0, 1},
 			new int[] { 1, 0}
 		};
-		super(shape, 0);
-		
-	}
-
-	/*@Override
-	public Boolean isTuring() {
-		return true;
-	}*/
-
-	@Override
-	public void renderSelf(Graphics2D gr, int cellSize) {
-		var shape = this.getShape();
-		gr.setColor(new Color(200,50,50));
-		for(int i = 0; i < shape.length; i++) {
-			for (int j = 0; j < shape[i].length; j++) {
-				if (shape[i][j] == 1) {
-					gr.fillRect(i*cellSize, j * cellSize,
-							cellSize, cellSize);
-				}
-			}
-		}
-		//System.out.println("Sword is rendering !");
+		var renderer = new WoodenSwordRenderer();
+		var initPos = ServiceResolver.getService(BaseLayoutInformation.class).bagPosition();
+		super(shape, 2, initPos, renderer);
+		//this.setActive(false);
+		IO.println(this + " init pose: " + initPos);
+		renderer.setGameObject(this);
 	}
 
 	@Override
 	public Boolean dropPossible() {
 		return true;
+	}
+
+	@Override
+	public void use() {
+		var playerResources = ServiceResolver.getService(Player.class).getResources();
+		var pos = playerResources.useAttackPossible(attack);
+		if(pos) {
+			EventBus.PublishEvent(AttackEvent.class, new AttackEvent(this, attack));
+		}else {
+			EventBus.PublishEvent(NotificationEvent.class,
+					new NotificationEvent(this, "Impossible to use " + attack + " - energy/mana not sufficient"));
+		}
+	}
+	
+	@Override
+	protected void Update() {
+		
+	}
+	
+	@Override
+	public Boolean rotatePossible() {
+		return true;
+	}
+
+	@Override
+	protected void onDispose() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void onClick() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

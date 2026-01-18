@@ -14,9 +14,18 @@ import com.github.forax.zen.KeyboardEvent.Key;
 import com.github.forax.zen.PointerEvent;
 
 import Game.Weapons.WoodenSword;
-import domain.bag.Bag;
-import domain.bag.Baggable;
-import domain.bag.DropStockEvent;
+import Game.bag.Bag;
+import Game.bag.DropItemEvent;
+import Game.bag.DropStockEvent;
+import Game.bag.GI.BagGI;
+import Game.bag.items.Baggable;
+import Game.player.Player;
+import Game.rendering.BaseBackgroundRenderer;
+import Game.rendering.BaseLayoutInformation;
+import Game.storages.StorageEntry;
+import Game.storages.treasury.Treasury;
+import domain.DI.ServiceResolver;
+import domain.Graphics.Vector2;
 import domain.eventing.EventBus;
 import domain.map.LiberateRoomEvent;
 import domain.map.Room;
@@ -32,93 +41,93 @@ public class RoomMenu extends MenuBase {
 	
 	private Room baseRecord;
 	
-	private Baggable[] stock;
-	//test
-	//private Bag bagManager;
+	private Treasury roomStock;
+	
+	private BaseBackgroundRenderer bg;
 	
 	public RoomMenu(Room room) {
 		Objects.requireNonNull(room);
 		
 		this.baseRecord = room;
 		
-		/*this.freePassage = room.getFreePassage();
-		var contentSupplier = room.getContentFabric(); //can be null if the room is empty
+		roomStock = new Treasury(new Vector2(25, 15), 6, 6);
 		
-		if(contentSupplier != null) {
-			content = contentSupplier.get();
-			EventBus.PublishEvent(OpenMenuEvent.class, new OpenMenuEvent(this, content));
-			
-		}*/
+		var layout = ServiceResolver.getService(BaseLayoutInformation.class);
+		var roomStockEntry = new StorageEntry(new Vector2(
+				layout.getXCenterUnits() - 2,
+				layout.getBackgroundWallBottom() / layout.baseCellSize()),
+				roomStock);
 		
-		stock = room.getStock();
+		for (var item : room.getStock()) {
+				item.setActive(true);
+				roomStock.addTreasure(item);
+		}
+		addObject(roomStockEntry);
 		
-		Consumer<Object> liberationListener = x -> {
-			//var ev = (LiberateRoomEvent)x;
+		Consumer<LiberateRoomEvent> liberationListener = x -> {
 			baseRecord.setFree();
+			revealObjects();
 		};
 		addListener(LiberateRoomEvent.class, liberationListener);
 		
-		Consumer<Object> stockListener = x -> {
-			var ev = (DropStockEvent)x;
-			stock = ev.stock();
+		Consumer<DropItemEvent> stockListener = ev -> {
+			roomStock.addTreasure(ev.item());
 		};
-		addListener(DropStockEvent.class, stockListener);
+		addListener(DropItemEvent.class, stockListener);
 		
+		bg = ServiceResolver.getService(BaseBackgroundRenderer.class);
 	      //int res = bagManager.tryAddItem(new WoodenSword(), 0, 2, 2);
 	      //IO.println(res==0?"Sword inserted":"Failed to insert sword...");
 	}
 	
+	@Override
+	protected void onAwake() {
+		if (baseRecord.getContentFabric() != null) {
+			var content = baseRecord.getContentFabric().get();
+			EventBus.PublishEvent(OpenMenuEvent.class, new OpenMenuEvent(content, false));
+			hideObjects();
+		}
+	}
 	
 	@Override
-	public void handleKey(KeyboardEvent ev) {
+	public boolean handleKey(KeyboardEvent ev) {
 		if (ev.action() != Action.KEY_PRESSED) {
-			return;
+			return false;
 		}
 		var key = ev.key();
 		switch(key) {
 			case Key.SPACE:
 				if (baseRecord.getContentFabric() != null) {
 					var content = baseRecord.getContentFabric().get();
-					EventBus.PublishEvent(OpenMenuEvent.class, content);
+					EventBus.PublishEvent(OpenMenuEvent.class, new OpenMenuEvent(content, false));
 				}else {
-					//no need to clear room's stock - at onDispose
-					//	the BagMenu always emits DropStockEvent, and room's stock
-					// 	would be set to it's value
-					var itemsCollectMenu = new BagMenu(stock, null);
-					
-					var openMenuEv = new OpenMenuEvent(this, itemsCollectMenu);
-					EventBus.PublishEvent(OpenMenuEvent.class, openMenuEv);
+					ServiceResolver.getService(BagGI.class).setActive(true);
 				}
-				break;
+				return true;
 			case Key.M:
 				//because the input-event flow, you can'not open a Map for example during a combat
 				//	or an important dialog: RoomMenu won't see your input
 				var mapMenu = new MapMenu();
-				var openMenuEv = new OpenMenuEvent(this, mapMenu);
+				IO.println("Opening map menu - " + mapMenu);
+				var openMenuEv = new OpenMenuEvent(mapMenu, true);
 				EventBus.PublishEvent(OpenMenuEvent.class, openMenuEv);
-				break;
+				dispose();
+				return true;
 			case Key.ESCAPE:
 				dispose();
-				break;
+				return true;
 		}
+		return false;
 	}
 	
 	@Override
-	public void renderSelf(Graphics2D gr) {
-		gr.clearRect(0, 0, 1920, 1200);
-		int i = 0;
-		for(int y = 800; y > 500; y -= 20) {
-			int xOff =  ((i++) % 2) * 30; 
-			for (int x = xOff; x < 1920; x += 60) {
-				gr.setColor(new Color(50,50,50));
-				gr.fillRect(x, y, 59, 19);
-			}
-		}
+	protected void onDispose() {
+		baseRecord.saveResources(roomStock.getTreasures());
 	}
-
+	
 	@Override
-	public void handleMouse(PointerEvent ev) {
-		return;
+	public void onRender(Graphics2D gr) {
+		bg.render(gr);
 	}
 
 }
