@@ -22,6 +22,7 @@ import Game.bag.GI.BagGI;
 import Game.bag.items.Baggable;
 import Game.enemies.Enemy;
 import Game.player.Player;
+import Game.player.PlayerDeadEvent;
 import Game.rendering.BaseBackgroundRenderer;
 import Game.rendering.BaseLayoutInformation;
 import domain.DI.ServiceResolver;
@@ -43,6 +44,8 @@ public class CombatMenu extends MenuBase {
 	private BaseLayoutInformation layout;
 	private int cellSize;
 	private BaseBackgroundRenderer bg;
+
+	private boolean playerDead;
 	
 	private Vector2 randomEnemyPos() {
 		var layout = ServiceResolver.getService(BaseLayoutInformation.class);
@@ -86,6 +89,8 @@ public class CombatMenu extends MenuBase {
 		this.reward = reward;
 		
 		bg = ServiceResolver.getService(BaseBackgroundRenderer.class);
+
+		playerDead = false;
 	}
 	
 	@Override
@@ -137,8 +142,7 @@ public class CombatMenu extends MenuBase {
 		var player_res = ServiceResolver.getService(Player.class).getResources();
 		player_res.repose();
 		if (player_res.isDead()) {
-			dispose();
-			EventBus.PublishEvent(OpenMenuEvent.class, new OpenMenuEvent(new BadEndMenu(), true));
+			EventBus.PublishEvent(PlayerDeadEvent.class, new PlayerDeadEvent());
 		}
 		if (numAlive == 0) {
 			dispose();
@@ -154,7 +158,6 @@ public class CombatMenu extends MenuBase {
 		var key = ev.key();
 		switch(key) {
 			case Key.SPACE:
-				IO.println("Space catched by Vombat menu");
 				if (!ServiceResolver.getService(BagGI.class).getActive()){
 					ServiceResolver.getService(BagGI.class).setActive(true);
 				}else{

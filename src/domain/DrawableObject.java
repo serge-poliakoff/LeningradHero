@@ -41,18 +41,13 @@ public abstract class DrawableObject extends Subscribeable {
 		if (adapter == null) {
 			throw new StartUpException("Adapter, required for DrawableObject" + this + " was not present in DI");
 		}
-		Consumer<UpdateEvent> k = (ev) -> {
+		Consumer<UpdateEvent> updateListener = (ev) -> {
 			if (active) {
 				Update();
 				adapter.callRenderer(ev.gr(), renderer, getAbsolutePosition(), rotation, scale);
 			}
 		};
-		Consumer<PlayerDeadEvent> k2 = (ev) -> {
-			this.setActive(false);
-			this.dispose();
-		};
-		addListener(UpdateEvent.class, k);
-		addListener(PlayerDeadEvent.class, k2);
+		addListener(UpdateEvent.class, updateListener);
 	}
 	
 	public void setActive(boolean active) {

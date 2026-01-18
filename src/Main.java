@@ -19,6 +19,7 @@ import Game.graphicComponents.NotificationManager;
 import Game.graphicComponents.PlayerStats;
 import Game.graphicComponents.UIComponent;
 import Game.player.Player;
+import Game.player.PlayerDeadEvent;
 import Game.rendering.BaseBackgroundRenderer;
 import Game.rendering.BaseLayoutInformation;
 import Game.storages.treasury.Treasury;
@@ -47,23 +48,20 @@ public class Main {
 	
 	private static List<MenuBase> menus = new ArrayList<MenuBase>();
 	
+	private static boolean playerDead = false;
 	
 	public static void main(String[] args) {
-		
+		EventBus.registerListener(PlayerDeadEvent.class, (ev) -> {
+			playerDead = true;
+			menus.clear();
+			menus.add(new BadEndMenu());
+		});
 		//adding menus to the render queue
 		EventBus.registerListener(OpenMenuEvent.class, ev -> {
 			var event = (OpenMenuEvent) ev;
 			
 			ServiceResolver.getService(BagGI.class).setActive(false);
-			//check if menu is ending
-			if (event.menu() instanceof BadEndMenu) {
-				for(var menu : menus) {
-					menu.dispose();
-				}
-				menus.clear();
-				menus.add(event.menu());
-				return;
-			}
+			
 			
 			if (ev.disposeLast() && menus.size() > 0)
 				menus.remove(menus.size() - 1);
@@ -189,11 +187,14 @@ public class Main {
 		        	
 		        	graphics.clearRect(0, 0, info.width(), info.height());
 		        	menus.getLast().renderSelf(graphics);
-		        	EventBus.PublishEvent(UpdateEvent.class, new UpdateEvent(graphics));
+
+					if (!playerDead){
+		        		EventBus.PublishEvent(UpdateEvent.class, new UpdateEvent(graphics));
 		        	
-		        	for(var uicomp : grComponents) {
-		        		uicomp.renderSelf(graphics);
-		        	}
+						for(var uicomp : grComponents) {
+							uicomp.renderSelf(graphics);
+						}
+					}
 		        });
 		        	
 		        	
