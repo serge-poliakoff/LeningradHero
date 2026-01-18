@@ -13,6 +13,8 @@ import domain.playerInput.MouseEvent;
 import domain.playerInput.clicking.OnClickEvent;
 
 public class DragManager implements KeyboardHandler{
+	///minimal mouse delta square to start dragging object
+	private final int deltaMin = 5;
 	///the object, user is dragging or is might prepare to drag
 	private Draggable inHand;
 	/// signals if object is no longer counted where it have appeared
@@ -77,10 +79,11 @@ public class DragManager implements KeyboardHandler{
 	private void drag(int x, int y, int delta) {
 		if (!draggedAway) {
 			//IO.println("DragManager: Start dragging request with delta = " + delta);
-			if (delta < 10) return;
+			if (delta < 5) return;
 			EventBus.PublishEvent(DragStartEvent.class,
 					new DragStartEvent(this, inHand));
 			draggedAway = true;
+			inHand.setDragged(draggedAway);
 		}
 		
 		inHand.moveTo(new Vector2(x, y));
@@ -93,6 +96,8 @@ public class DragManager implements KeyboardHandler{
 		if (!dropSuccess) {
 			inHand.getBack();
 		}
+		inHand.setDragged(false);
+		//reinitialise all values before next operation
 		inHand = null;
 		draggedAway = false;
 		dropSuccess = false;

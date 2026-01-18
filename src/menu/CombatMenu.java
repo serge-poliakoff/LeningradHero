@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.github.forax.zen.KeyboardEvent;
 import com.github.forax.zen.PointerEvent;
@@ -36,7 +37,7 @@ import domain.playerInput.clicking.OnClickEvent;
 
 public class CombatMenu extends MenuBase {
 	private List<Enemy> enemies;
-	private Baggable[] reward;
+	private Supplier<List<Baggable>> reward;
 	private Enemy inSight;
 	
 	private BaseLayoutInformation layout;
@@ -50,8 +51,13 @@ public class CombatMenu extends MenuBase {
 				layout.getXCenterUnits() / 3, 5);
 	}
 	
+	public CombatMenu(Supplier<List<Enemy>> enemies, Supplier<List<Baggable>> reward){
+		var ens = enemies.get().toArray(new Enemy[]{});
+		this(ens, reward);
+	}
+
 	///creates a combat menu with given enemies and a reward, which would be given at the end of combat
-	public CombatMenu(Enemy enemies[], Baggable[] reward) {
+	public CombatMenu(Enemy enemies[], Supplier<List<Baggable>> reward) {
 		Objects.requireNonNull(enemies);
 		Objects.requireNonNull(reward);
 		
@@ -148,7 +154,14 @@ public class CombatMenu extends MenuBase {
 		var key = ev.key();
 		switch(key) {
 			case Key.SPACE:
-				ServiceResolver.getService(BagGI.class).setActive(true);
+				IO.println("Space catched by Vombat menu");
+				if (!ServiceResolver.getService(BagGI.class).getActive()){
+					ServiceResolver.getService(BagGI.class).setActive(true);
+				}else{
+					IO.println("Boosting...");
+					var playerResources = ServiceResolver.getService(Player.class).getResources();
+					playerResources.boostProtection();
+				}
 				return true;
 			case Key.P:
 				makeCycle();
@@ -160,8 +173,10 @@ public class CombatMenu extends MenuBase {
 	@Override
 	protected void onMenuDispose() {
 		EventBus.PublishEvent(LiberateRoomEvent.class, new LiberateRoomEvent());
-		for (var rewardItem : reward)
+		for (var rewardItem : reward.get()){
+			rewardItem.setActive(true);
 			EventBus.PublishEvent(DropItemEvent.class, new DropItemEvent(rewardItem));
+		}
 	}
 
 }

@@ -11,7 +11,7 @@ public class Player extends DrawableObject {
 	private PlayerResources resources;
 	
 	public Player() {
-		resources = new PlayerResources(6, 3, 0, 0);
+		resources = new PlayerResources(3, 3, 0, 0);
 		var renderer = new PlayerRenderer();
 		var pos = ServiceResolver.getService(BaseLayoutInformation.class).playerPosition();
 		super(pos, renderer);

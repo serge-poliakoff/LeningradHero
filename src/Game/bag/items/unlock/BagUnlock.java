@@ -5,14 +5,16 @@ import domain.Graphics.RendererBase;
 import domain.Graphics.Vector2;
 
 public class BagUnlock extends Baggable {
-	private BagUnlockRenderer renderer;
 	
 	public BagUnlock(int[][] shape, Vector2 pos) {
 		int cost = 0;
 		var renderer = new BagUnlockRenderer();
-		super(shape, cost, pos, renderer);
-		
-		this.renderer = renderer;
+		String[] desc = new String[]{
+			"A thing that can unlock more place in your bag",
+			"A good, a rare thing..."
+		};
+		super(shape, cost, desc, pos, renderer);
+
 		renderer.setGameObject(this);
 	}
 
@@ -29,16 +31,6 @@ public class BagUnlock extends Baggable {
 	@Override
 	public void use() {
 		
-	}
-
-	@Override
-	protected void onClick() {
-		renderer.setSelected(true);
-	}
-	
-	@Override
-	protected void onUnClick() {
-		renderer.setSelected(false);
 	}
 
 	@Override

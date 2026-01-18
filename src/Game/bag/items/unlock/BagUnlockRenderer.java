@@ -8,18 +8,13 @@ import domain.Graphics.RendererBase;
 
 class BagUnlockRenderer extends RendererBase {
 	private BagUnlock gameObject;
-	private boolean selected;
+
 	public BagUnlockRenderer() {
 		super();
-		selected = false;
 	}
 	
 	public void setGameObject(BagUnlock gameObject) {
 		this.gameObject = gameObject;
-	}
-	
-	public void setSelected(boolean selected) {
-		this.selected = selected;
 	}
 
 	@Override
@@ -30,30 +25,26 @@ class BagUnlockRenderer extends RendererBase {
 		}
 		var shape = gameObject.getShape();
 		int cellSize = this.getCellSize();
-		int cellFilledSize = cellSize;
-		int offset = 0;
-		
-		if (selected) {
-			gr.setColor(Color.white);
-			for(int i = 0; i < shape.length; i++) {
-				for (int j = 0; j < shape[i].length; j++) {
-					if (shape[i][j] == 1) {
-						gr.fillRect(i*cellSize, j * cellSize,
-								cellSize, cellSize);
-					}
-				}
-			}
-			cellFilledSize -= 2;
-			offset = 1;
-		}
+
 		
 		gr.setColor(new Color(200,200,200));
 		for(int i = 0; i < shape.length; i++) {
 			for (int j = 0; j < shape[i].length; j++) {
 				if (shape[i][j] == 1) {
-					gr.fillRect(offset + i*cellSize, offset + j * cellSize,
-							cellFilledSize, cellFilledSize);
+					gr.fillRect(i*cellSize, j * cellSize,
+							cellSize, cellSize);
 				}
+			}
+		}
+
+		if (gameObject.getDragged()){
+			gr.setColor(Color.white);
+			int h = 10;
+			IO.println(gameObject.getDescription());
+			for(var s : gameObject.getDescription()) {
+				gr.drawBytes(s.getBytes(), 0, s.length(), 
+						shape.length * cellSize, h);
+				h += 15;
 			}
 		}
 	}

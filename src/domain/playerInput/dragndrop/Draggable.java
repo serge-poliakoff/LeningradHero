@@ -11,14 +11,25 @@ import domain.playerInput.clicking.Clickable;
 public abstract class Draggable extends Clickable {
 	
 	private Runnable getBack;
-	
+	private boolean dragged;
+
 	protected Draggable(Vector2 pos, RendererBase renderer) {
 		super(pos, renderer);
+
+		this.dragged = false;
 	}
 	
 	public final void setGetBack(Runnable getBack) {
 		Objects.requireNonNull(getBack);
 		this.getBack = getBack;
+	}
+
+	public final void setDragged(boolean dragged){
+		this.dragged = dragged;
+	}
+
+	public final boolean getDragged(){
+		return dragged;
 	}
 	
 	public final void getBack() {

@@ -9,4 +9,8 @@ public class PlayerResources extends ResourceManager {
 		// TODO Auto-generated constructor stub
 	}
 
+	public void heal(int amount){
+		this.setHealth(this.getHealth() + amount);
+	}
+
 }

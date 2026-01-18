@@ -1,16 +1,6 @@
 package Game.bag.GI;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import com.github.forax.zen.*;
@@ -20,10 +10,8 @@ import com.github.forax.zen.KeyboardEvent.Key;
 import Game.bag.Bag;
 import Game.bag.items.Baggable;
 import Game.rendering.BaseLayoutInformation;
-import domain.DrawableObject;
 import domain.DI.ServiceResolver;
 import domain.Graphics.Vector2;
-import domain.eventing.EventBus;
 import domain.playerInput.KeyboardHandler;
 import domain.playerInput.clicking.OnClickEvent;
 import domain.playerInput.dragndrop.DragDropEvent;
@@ -153,15 +141,16 @@ public class BagGI extends DroppableArea implements KeyboardHandler{
 		return false;
 	}
 	
-	private Boolean tryAddAtPlace(Baggable item, Vector2 pos) {
+	///tries to return object back where it belongs.
+	private void tryAddAtPlace(Baggable item, Vector2 pos) {
 		item.setParent(this);
 		item.moveTo(pos);
 		//IO.println("Bag GI: adding " + item + " at rel pos " + item.getPosition());
 		var res = bagManager.tryAddItem(item);
 		if (res)
-			return true;
+			return;
 		item.resetParent();
-		return false;
+		//item.dispose();
 	}
 	
 	@Override
@@ -176,9 +165,11 @@ public class BagGI extends DroppableArea implements KeyboardHandler{
 		var key = ev.key();
 		switch(key) {
 			case Key.SPACE:
-				if (inHand != null)
+				if (inHand != null){
 					usage.accept(inHand);
-				return true;
+					return true;
+				}
+				return false;
 			case Key.ESCAPE:
 				inHand = null;
 				this.setActive(false);

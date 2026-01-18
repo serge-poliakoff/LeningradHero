@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+import Game.player.PlayerDeadEvent;
 import domain.DI.ServiceResolver;
 import domain.Errors.StartUpException;
 import domain.Graphics.GraphicsAdapter;
@@ -46,7 +47,12 @@ public abstract class DrawableObject extends Subscribeable {
 				adapter.callRenderer(ev.gr(), renderer, getAbsolutePosition(), rotation, scale);
 			}
 		};
+		Consumer<PlayerDeadEvent> k2 = (ev) -> {
+			this.setActive(false);
+			this.dispose();
+		};
 		addListener(UpdateEvent.class, k);
+		addListener(PlayerDeadEvent.class, k2);
 	}
 	
 	public void setActive(boolean active) {

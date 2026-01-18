@@ -94,12 +94,14 @@ public class Bag {
 		}
 		
 		for(var it : toDrop)
-			dropItem(it);
+			dropItemToRoom(it);
 		
 		equipement.add(item);
 		for(var cell : cellsOccupied) {
 			space[cell.x()][cell.y()] = 1;
 		}
+
+		item.setBag(this);
 		
 		return true;
 	}
@@ -131,7 +133,7 @@ public class Bag {
 		return true;
 	}
 	
-	
+	///removes item from bag definetly
 	public void dropItem(Baggable item){
 		Objects.requireNonNull(item);
 		
@@ -149,8 +151,14 @@ public class Bag {
 			}
 		}
 		equipement.remove(item);
-		EventBus.PublishEvent(DropItemEvent.class, new DropItemEvent(item));
+		
 		return;
+	}
+
+	///drops item, publishing event, so that current room can catch it
+	private void dropItemToRoom(Baggable item){
+		dropItem(item);
+		EventBus.PublishEvent(DropItemEvent.class, new DropItemEvent(item));
 	}
 	
 }

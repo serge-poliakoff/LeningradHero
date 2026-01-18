@@ -32,10 +32,17 @@ public class ResourceManager {
 	public int getEnergy() {
 		return energy;
 	}
+
+	protected void setHealth(int health){
+		this.health = health;
+	}
 	
-	//override in player to emit "PlayerDead" event
 	public void inflictDamage(Attack attack) {
-		health -= attack.damage() - protectionLevel;
+		protectionLevel -= attack.damage();
+		if (protectionLevel < 0){
+			health += protectionLevel;
+			protectionLevel = 0;
+		}
 		if (health <= 0) {
 			dead = true;
 		}
@@ -51,7 +58,12 @@ public class ResourceManager {
 	}
 	
 	public void boostProtection() {
-		protectionLevel += 5;
+		IO.println("Boost protection for " + this);
+		if (energy >= 2){
+			IO.println("Protection boost success");
+			energy -= 2;
+			protectionLevel += 1;
+		}
 	}
 	
 	public void repose() {

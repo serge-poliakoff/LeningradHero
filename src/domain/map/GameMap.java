@@ -1,5 +1,7 @@
 package domain.map;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import Game.Weapons.WoodenSword;
@@ -7,6 +9,7 @@ import Game.bag.items.Baggable;
 import Game.bag.items.unlock.BagUnlock;
 import Game.enemies.Enemy;
 import Game.enemies.Rat.Rat;
+import Game.resources.RatMeat.RatMeat;
 import domain.Graphics.Vector2;
 import domain.combat.IEnemy;
 import domain.eventing.EventBus;
@@ -25,10 +28,32 @@ public class GameMap {
 	}
 	
 	private Room combatRoom() {
+		var rnd = 1 + Math.round(Math.random() * 2);
+		Supplier<List<Enemy>> getEnemies = () -> {
+			var ens = new ArrayList<Enemy>();
+			for (int i = 0; i < rnd; i ++){
+				ens.add( new Rat(new Vector2(0, 0)));
+			}
+			return ens;
+		};
+		Supplier<List<Baggable>> getReward = () -> {
+			var rw = new ArrayList<Baggable>();
+			if (rnd == 4){
+				rw.add(new BagUnlock(
+						new int[][] {
+							new int[] { 1 }
+						}, new Vector2(0,0)));
+				return rw;
+			}
+			for (int i = 0; i < rnd; i ++){
+				rw.add( new RatMeat());
+			}
+			return rw;
+		};
 		Supplier<MenuBase> combat = () -> new CombatMenu(
-				new Enemy[] { new Rat(new Vector2(0, 0)), new Rat(new Vector2(0, 0))},
-				new Baggable[] {});
-		return new Room(false, combat, new Baggable[] {new WoodenSword()});
+				getEnemies,
+				getReward);
+		return new Room(false, combat, new Baggable[] {});
 	}
 	
 	private Room treasureRoom() {
@@ -55,13 +80,13 @@ public class GameMap {
 		map[1][1] = combatRoom();
 		map[0][1] = treasureRoom();
 		map[1][2] = combatRoom();
-		map[2][1] = emptyRoom();
+		map[2][1] = treasureRoom();
 		map[2][2] = emptyRoom();
 		map[2][3] = treasureRoom();
 		map[3][2] = combatRoom();
-		map[3][3] = emptyRoom();
+		map[3][3] = treasureRoom();
 		map[4][2] = combatRoom();
-		map[5][2] = emptyRoom();
+		map[5][2] = treasureRoom();
 		map[5][1] = combatRoom();
 		map[6][0] = treasureRoom();
 		map[6][1] = emptyRoom();

@@ -19,6 +19,7 @@ Game.enemies.Rat
 Game.graphicComponents
 Game.player
 Game.rendering
+Game.resources.RatMeat
 Game.storages
 Game.storages.treasury
 Game.Weapons
