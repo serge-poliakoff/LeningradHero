@@ -3,40 +3,51 @@
 
 <project default="jar" name="BackpackHero" basedir=".">
     
-    <property name="dir.buildfile" value="."/>
+    <property name="file.build" value="BackpackHero.jar"/>
 	<property name="dir.src" value="src"/>
     <property name="dir.classes" value="class"/>
-    <property name="dir.jarfile" value="${dir.buildfile}"/>
 	<property name="dir.lib" value="lib"/>
+    <property name="dir.doc" value="doc"/>
 	
-<target name="print-version"> 
-    <echo>Java/JVM version: ${ant.java.version}</echo> 
-    <echo>Java/JVM detail version: ${java.version}</echo> 
+    <target name="version"> 
+        <echo>Java version: ${ant.java.version}</echo> 
     </target>
 
-	<target name="init" depends="print-version">
+    <target name="clean">
+        <delete dir="${dir.classes}"/>
+        <delete file="${file.build}"/>
+    </target>
+
+	<target name="init">
 		<mkdir dir="${dir.classes}"/>
 	</target>
 
-    
+    <target name="doc" depends="init">
+        <javadoc sourcepath="${dir.src}" destdir="${dir.doc}">
+            <classpath>
+                <fileset dir="${dir.lib}" includes="zen-6.0.jar"/>
+            </classpath>
+        </javadoc>
+
+    </target>
 
     <target name="compile" depends="init">
         <javac srcdir="${dir.src}" destdir="${dir.classes}"
                 includeantruntime="false">
             <classpath>
-                <fileset dir="${dir.lib}" includes="*.jar"/>
+                <fileset dir="${dir.lib}" includes="zen-6.0.jar"/>
             </classpath>
         </javac>
     </target>
 	
   <target name="jar" depends="compile">
-        <jar destfile="${dir.jarfile}/BackPackHero.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="${file.build}" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="Main"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="${dir.classes}"/>
-            <zipfileset excludes="META-INF/*.SF" src="${dir.jarfile}/lib/zen-6.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.lib}/zen-6.0.jar"/>
         </jar>
     </target>
 </project>
